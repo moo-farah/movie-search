@@ -8,9 +8,28 @@ const Search = () => {
     setQuery("");
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Searching for:", query)
+    console.log("Searching for:", query);
+
+    // Don't search if the query is empty
+    // if (!query.trim()) 
+    //   return console.log('Searching for:', query);
+
+    // API Key
+    const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+
+    // Build the correct TMDB search URL
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Status: ${res.status}`)
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.log('Error fetching movies', error.message);
+    }
   }
 
   return (
