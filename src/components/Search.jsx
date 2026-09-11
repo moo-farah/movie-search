@@ -3,6 +3,7 @@ import { Search as SearchIcon, X as ClearIcon } from "lucide-react"
 
 const Search = () => {
   const [query, setQuery] = useState("");
+  const [movies, setMovies] = useState([]);
 
   const handleClear = () => {
     setQuery("");
@@ -13,8 +14,8 @@ const Search = () => {
     console.log("Searching for:", query);
 
     // Don't search if the query is empty
-    // if (!query.trim()) 
-    //   return console.log('Searching for:', query);
+    if (!query.trim()) 
+      return console.log('Searching for:', query);
 
     // API Key
     const apiKey = import.meta.env.VITE_TMDB_API_KEY;
@@ -26,13 +27,15 @@ const Search = () => {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Status: ${res.status}`)
       const data = await res.json();
-      console.log(data);
+      console.log(data.results);
+      setMovies(data.results);
     } catch (error) {
       console.log('Error fetching movies', error.message);
     }
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto mt-8">
       <div className="relative group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -92,6 +95,11 @@ const Search = () => {
         </button>
       </div>
     </form>
+    <div className="card-list">
+                {movies.map(movie => movie.title)}
+            </div> 
+    </>
+     
   )
 }
 
