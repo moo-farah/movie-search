@@ -1,46 +1,62 @@
 import { useState } from "react"
-import { Search as SearchIcon, X as ClearIcon } from "lucide-react"
+import { Search as SearchIcon, X as ClearIcon, Loader2, Film } from "lucide-react"
+import MovieCard from "./MovieCard";
 
 const Search = () => {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
+  // Reset the search back to an empty
   const handleClear = () => {
     setQuery("");
+    setMovies([]);
+    setError(null);
+    setHasSearched(false)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("Searching for:", query);
-
-    // Don't search if the query is empty
-    if (!query.trim()) 
-      return console.log('Searching for:', query);
+    if (!query.trim()) return
 
     // API Key
     const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+    if (!apiKey) {
+      setError('Missing VITE_TMDB_API_KEY in .env file')
+      setLoading(false);
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+    setHasSearched(true)
 
     // Build the correct TMDB search URL
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}&include_adult=false`
 
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`Status: ${res.status}`)
+      if (!res.ok) throw new Error(`HTTP: ${res.status}`)
       const data = await res.json();
       console.log(data.results);
       setMovies(data.results);
     } catch (error) {
-      console.log('Error fetching movies', error.message);
+      console.log('Failed to load movies', error.message);
+      setMovies([])
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <>
+    <div className="w-full max-w-6xl mx-auto">
     <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto mt-8">
       <div className="relative group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
           <SearchIcon
-            className="text-lime-300 transition-colors duration-200 group-focus-within:text-lime-100"
+            className="text-[#FD9797]/60 transition-colors duration-200 group-focus-within:text-[#FD9797]"
             size={20}
             strokeWidth={2.25}
           />
@@ -91,14 +107,56 @@ const Search = () => {
             focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FD9797] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FD9797]
             shadow-md shadow-lime-900/30"
         >
-          <SearchIcon size={18} strokeWidth={2.5} />
+          {loading ? (
+            <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />
+          ): (
+            <SearchIcon size={18} strokeWidth={2.5} />
+          )}
+          
         </button>
       </div>
     </form>
-    <div className="card-list">
-                {movies.map(movie => movie.title)}
-            </div> 
-    </>
+
+    <div className="mt-12">
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-[#F2F2F2]/70">
+          <Loader2 size={32} className="animate-spin text-[#FD9797]" />
+          <p className="text-sm text-zinc-900">Searching movies...</p>
+        </div>
+      )}
+      {!loading && error && (
+        <div className="max-w-xl mx-auto text-center py-12 px-6 rounded-2xl bg-red-950/30 border border=red-500/30">
+          <p className="text-red-300 font-semibold mb-1">Semething went wrong</p>
+          <p className="text-red-300/80 text-sm">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && hasSearched && movies.length === 0 &&(
+        <div className="max-w-xl mx-auto text-center p-16">
+          <Film className="mx-auto mb-4 text-[#FD9797]/50" size={48} strokeWidth={1.5} />
+          <p className="text-lg font-semibold text-[#F2F2F2] mb-1">No movies found</p>
+          <p className="text-sm text-[#F2F2F2] mb-1">Try a different keyword, or check your spelling.</p>
+        </div>
+      )}
+
+      {!loading && !error && movies.length > 0 && (
+        <>
+        <p className="text-sm text-[#F2F2F2]/60 mb-5 px-1">
+        {movies.length} result{movies.length === 1 ? "" :
+        "S"} for{""}
+        <span className="text-[#FD9797] font-semibold">&
+          ldquo;{query}&rdquo;</span>
+        </p>
+        <div className="grid grid-col-2 sm:grid-cols=3 
+        md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {movies.map((movie, i) => (
+            <MovieCard key={movie.id} movie={movie} index={i}/>
+          ))}
+        </div>
+        </>
+      )}
+    </div>
+    </div>
      
   )
 }
