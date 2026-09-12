@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search as SearchIcon, X as ClearIcon, Loader2, Film } from "lucide-react"
+import { Search as SearchIcon, X as ClearIcon, Loader2, Loader, Film } from "lucide-react"
 import MovieCard from "./MovieCard";
 
 const Search = () => {
@@ -108,7 +108,7 @@ const Search = () => {
             shadow-md shadow-lime-900/30"
         >
           {loading ? (
-            <Loader2 size={18} className="animate-spin" strokeWidth={2.5} />
+            <Loader size={18} className="animate-spin" strokeWidth={2.5} />
           ): (
             <SearchIcon size={18} strokeWidth={2.5} />
           )}
@@ -133,21 +133,21 @@ const Search = () => {
 
       {!loading && !error && hasSearched && movies.length === 0 &&(
         <div className="max-w-xl mx-auto text-center p-16">
-          <Film className="mx-auto mb-4 text-[#FD9797]/50" size={48} strokeWidth={1.5} />
-          <p className="text-lg font-semibold text-[#F2F2F2] mb-1">No movies found</p>
-          <p className="text-sm text-[#F2F2F2] mb-1">Try a different keyword, or check your spelling.</p>
+          <Film className="mx-auto mb-4 text-[#FD9797]" size={48} strokeWidth={1.5} />
+          <p className="text-lg font-semibold text-[#121212] mb-1">No movies found</p>
+          <p className="text-sm text-[#121212]/50 mb-1">Try a different keyword, or check your spelling.</p>
         </div>
       )}
 
       {!loading && !error && movies.length > 0 && (
         <>
-        <p className="text-sm text-[#F2F2F2]/60 mb-5 px-1">
+        <p className="text-sm text-[#121212]/60 mb-5 px-1">
         {movies.length} result{movies.length === 1 ? "" :
-        "S"} for{""}
-        <span className="text-[#FD9797] font-semibold">&
-          ldquo;{query}&rdquo;</span>
+        "s"} for {" "}
+        <span className="text-[#51091D] font-medium">
+          &ldquo;{query}&rdquo;</span>
         </p>
-        <div className="grid grid-col-2 sm:grid-cols=3 
+        <div className="grid grid-col-2 sm:grid-cols-3 
         md:grid-cols-4 lg:grid-cols-5 gap-5">
           {movies.map((movie, i) => (
             <MovieCard key={movie.id} movie={movie} index={i}/>
