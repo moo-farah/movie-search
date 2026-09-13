@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Search as SearchIcon, X as ClearIcon, Loader2, Loader, Film } from "lucide-react"
+import { Search as SearchIcon, X as ClearIcon, Loader2, Film } from "lucide-react"
 import MovieCard from "./MovieCard";
 
 const Search = () => {
@@ -108,7 +108,7 @@ const Search = () => {
             shadow-md shadow-lime-900/30"
         >
           {loading ? (
-            <Loader size={18} className="animate-spin" strokeWidth={2.5} />
+            <SearchIcon size={18} strokeWidth={2.5} />
           ): (
             <SearchIcon size={18} strokeWidth={2.5} />
           )}
